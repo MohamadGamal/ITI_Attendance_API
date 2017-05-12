@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Tracks list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for track in tracks %}
+            <tr>
+                <td><a href="{{ path('tracks_show', { 'id': track.id }) }}">{{ track.id }}</a></td>
+                <td>{{ track.name }}</td>
+                <td>{{ track.code }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('tracks_show', { 'id': track.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('tracks_edit', { 'id': track.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('tracks_new') }}">Create a new track</a>
+        </li>
+    </ul>
+{% endblock %}
