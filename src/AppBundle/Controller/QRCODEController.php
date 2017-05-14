@@ -33,7 +33,7 @@ $qrCode
     ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
 ->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0])
     ->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255])
-    ->setLabel("Scan the code in $limit secounds !")
+    ->setLabel("Scan the code in $limit seconds !")
  //  ->setLogoPath(__DIR__.'/../Resources/QRrelated/logo.png')
     ->setLogoSize(150)
     ->setValidateResult(true)
@@ -41,16 +41,16 @@ $qrCode
 
 // Output the QR code
 header('Content-Type: '.$qrCode->getContentType(PngWriter::class));
-//$base64image=  base64_encode ( 
-    echo $qrCode->writeString(PngWriter::class);
-    die();//
- //   );
-//$fullimage='data:image/png;base64,'.$base64image;
+$base64image=  base64_encode ( 
+ $qrCode->writeString(PngWriter::class)
+//    die();//
+    );
+$fullimage='data:image/png;base64,'.$base64image;
 
 
-  //       $response = new Response($this->serialize(['type'=>"QRcode",'code'=>1,'image'=>$fullimage]), Response::HTTP_CREATED);
+         $response = new Response($this->serialize(['type'=>"QRcode",'code'=>1,'image'=>$fullimage]), Response::HTTP_CREATED);
      
-    //    return $this->setBaseHeaders($response);
+        return $this->setBaseHeaders($response);
 //         die();
 // // Save it to a file (guesses writer by file extension)
 // $qrCode->writeFile(__DIR__.'/qrcode.png');
@@ -87,6 +87,12 @@ header('Content-Type: '.$qrCode->getContentType(PngWriter::class));
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
+    }
+    private function generateRandomQRcode(){
+
+        return rand(1000000)."abcdefgh"[rand(7)].time();
+
+
     }
 
 }

@@ -127,6 +127,7 @@ catch(Exception $e){
     {
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
+  
         return $response;
     }
 

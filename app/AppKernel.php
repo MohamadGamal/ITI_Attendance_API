@@ -16,10 +16,11 @@ class AppKernel extends Kernel
             
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
 
- new JMS\SerializerBundle\JMSSerializerBundle(),
+        new JMS\SerializerBundle\JMSSerializerBundle(),
 
-    new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+        new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
+            new Nelmio\CorsBundle\NelmioCorsBundle(),
              new FOS\UserBundle\FOSUserBundle(),
               new Lexik\Bundle\JWTAuthenticationBundle\LexikJWTAuthenticationBundle(),
         new FOS\RestBundle\FOSRestBundle(),
