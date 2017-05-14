@@ -28,9 +28,8 @@ class BranchController extends Controller
 
         $branches = $em->getRepository('AppBundle:Branch')->findAll();
 
-        return $this->render('branch/index.html.twig', array(
-            'branches' => $branches,
-        ));
+          $response = new Response($this->serialize(['type'=>"Branch List",'code'=>1,'data'=>$branches]), Response::HTTP_CREATED);
+             return $this->setBaseHeaders($response);
     }
 
     /**
@@ -53,7 +52,7 @@ try{
 $em->persist($branch);
             $em->flush();
 
-              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'branch'=>$branch]), Response::HTTP_CREATED);
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$branch]), Response::HTTP_CREATED);
 
 }
 catch(Exception $e){
@@ -62,12 +61,7 @@ catch(Exception $e){
 }
               return $this->setBaseHeaders($response);
        
-     
-
-        return $this->render('branch/new.html.twig', array(
-            'branch' => $branch,
-            'form' => $form->createView(),
-        ));
+    
     }
 
     /**
@@ -78,37 +72,38 @@ catch(Exception $e){
      */
     public function showAction(Branch $branch)
     {
-        $deleteForm = $this->createDeleteForm($branch);
-
-        return $this->render('branch/show.html.twig', array(
-            'branch' => $branch,
-            'delete_form' => $deleteForm->createView(),
-        ));
+           $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$branch]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response);
     }
 
     /**
      * Displays a form to edit an existing branch entity.
      *
-     * @Route("/{id}/edit", name="branches_edit")
-     * @Method({"GET", "POST"})
+     * @Route("/{id}", name="branches_edit")
+     * @Method("PUT")
      */
     public function editAction(Request $request, Branch $branch)
     {
-        $deleteForm = $this->createDeleteForm($branch);
-        $editForm = $this->createForm('AppBundle\Form\BranchType', $branch);
-        $editForm->handleRequest($request);
+       
+       $branch->setName($request->request->get('name'));
+        $branch->setCode($request->request->get('code'));
+        $branch->setAddress($request->request->get('address')); 
+ var_dump($branch);
+        
+        die();
+        try{
+$em->persist($branch);
+            $em->flush();
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$branch]), Response::HTTP_CREATED);
 
-            return $this->redirectToRoute('branches_edit', array('id' => $branch->getId()));
-        }
+}
+catch(Exception $e){
 
-        return $this->render('branch/edit.html.twig', array(
-            'branch' => $branch,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+       
     }
 
     /**
@@ -119,33 +114,24 @@ catch(Exception $e){
      */
     public function deleteAction(Request $request, Branch $branch)
     {
-        $form = $this->createDeleteForm($branch);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+     
             $em = $this->getDoctrine()->getManager();
+          try{
             $em->remove($branch);
             $em->flush();
-        }
+    
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$branch]), Response::HTTP_CREATED);
 
-        return $this->redirectToRoute('branches_index');
+}
+catch(Exception $e){
+
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+      
     }
 
-    /**
-     * Creates a form to delete a branch entity.
-     *
-     * @param Branch $branch The branch entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Branch $branch)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('branches_delete', array('id' => $branch->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
-    }
+
 
        
         private function serialize($data)

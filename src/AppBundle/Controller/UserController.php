@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use JMS\Serializer\SerializationContext;
@@ -39,8 +40,78 @@ class UserController extends Controller
 
 
   
+/**
+     * Creates a new User entity.
+     *
+     * @Route("/", name="users_new")
+     * @Method("POST")
+     */
+    public function newAction(Request $request)
+    {
+       // $um = $this->container->get('fos_user.user_manager');
+        $em = $this->getDoctrine()->getManager();
+        $user =new User();// $um->createUser();
+         $user->setEmail($request->request->get('email')) ;
+    $user->setUsername($request->request->get('username')) ;
+    $user->setPlainPassword($request->request->get('password')) ;
+     $user->setTrack($em->getRepository('AppBundle:Track')->findOneById($request->request->get('track')));
+    $user->setEnabled(true) ;
+   $user->setRoles( array($request->request->get('role')=='admin'?User::ROLE_SUPER_ADMIN:User::ROLE_DEFAULT) ) ;
+  //  var_dump((new \ReflectionClass('AppBundle\Entity\User'))->getConstants());
+   
+try{
+ $em->persist($user);
+            $em->flush();
+
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
+
+}
+catch(Exception $e){
+
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+       
+    
+    }
+   /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/{id}", name="users_show")
+     * @Method("GET")
+     */
+    public function showAction(User $user)
+    {
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+    }
+
+        /**
+     * Deletes a user entity.
+     *
+     * @Route("/{id}", name="users_delete")
+     * @Method("DELETE")
+     */
+    public function deleteAction(Request $request, User $user)
+    {
 
 
+            $em = $this->getDoctrine()->getManager();
+          try{
+            $em->remove($user);
+            $em->flush();
+    
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
+
+}
+catch(Exception $e){
+
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+      
+       
+    }
 
 
 

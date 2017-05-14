@@ -167,4 +167,8 @@ class Branch
     {
         return $this->tracks;
     }
+        public function setTracks( $arrayt)
+    {
+         $this->tracks=new ArrayCollection($arrayt);;
+    }
 }

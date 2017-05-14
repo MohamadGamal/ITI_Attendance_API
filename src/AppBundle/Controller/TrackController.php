@@ -3,10 +3,13 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Track;
+
+use AppBundle\Entity\Branch;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Response;
+use JMS\Serializer\SerializationContext;
 /**
  * Track controller.
  *
@@ -26,8 +29,8 @@ class TrackController extends Controller
 
         $tracks = $em->getRepository('AppBundle:Track')->findAll();
 
-          $response = new Response($this->serialize(['type'=>"track List",'code'=>1,'tracks'=>$tracks]), Response::HTTP_CREATED);
-     
+          $response = new Response($this->serialize(['type'=>"track List",'code'=>1,'data'=>$tracks]), Response::HTTP_CREATED);
+        return $this->setBaseHeaders($response);
     }
 
     /**
@@ -38,24 +41,34 @@ class TrackController extends Controller
      */
     public function newAction(Request $request)
     {
-        var_dump($request);
-        die;
-        $track = new Track();
-        $form = $this->createForm('AppBundle\Form\TrackType', $track);
-        $form->handleRequest($request);
+        
+               $em = $this->getDoctrine()->getManager();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($track);
+        //      var_dump($request->request->get('array'));
+        // die;
+        //
+       
+
+        $track = new Track();
+       
+        $track->setName($request->request->get('name'));
+        $track->setCode($request->request->get('code'));
+        $track->setBranch($em->getRepository('AppBundle:Branch')->findOneById($request->request->get('branch')));
+          
+try{
+$em->persist($track);
             $em->flush();
 
-            return $this->redirectToRoute('tracks_show', array('id' => $track->getId()));
-        }
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
 
-        return $this->render('track/new.html.twig', array(
-            'track' => $track,
-            'form' => $form->createView(),
-        ));
+}
+catch(Exception $e){
+
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+       
+    
     }
 
     /**
@@ -66,37 +79,19 @@ class TrackController extends Controller
      */
     public function showAction(Track $track)
     {
-        $deleteForm = $this->createDeleteForm($track);
-
-        return $this->render('track/show.html.twig', array(
-            'track' => $track,
-            'delete_form' => $deleteForm->createView(),
-        ));
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
     }
 
     /**
      * Displays a form to edit an existing track entity.
      *
      * @Route("/{id}/edit", name="tracks_edit")
-     * @Method({"GET", "POST"})
+     * @Method("PUT")
      */
     public function editAction(Request $request, Track $track)
     {
-        $deleteForm = $this->createDeleteForm($track);
-        $editForm = $this->createForm('AppBundle\Form\TrackType', $track);
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('tracks_edit', array('id' => $track->getId()));
-        }
-
-        return $this->render('track/edit.html.twig', array(
-            'track' => $track,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
+       
     }
 
     /**
@@ -107,33 +102,26 @@ class TrackController extends Controller
      */
     public function deleteAction(Request $request, Track $track)
     {
-        $form = $this->createDeleteForm($track);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+
             $em = $this->getDoctrine()->getManager();
+          try{
             $em->remove($track);
             $em->flush();
-        }
+    
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
 
-        return $this->redirectToRoute('tracks_index');
+}
+catch(Exception $e){
+
+  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+}
+              return $this->setBaseHeaders($response);
+      
+       
     }
 
-    /**
-     * Creates a form to delete a track entity.
-     *
-     * @param Track $track The track entity
-     *
-     * @return \Symfony\Component\Form\Form The form
-     */
-    private function createDeleteForm(Track $track)
-    {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('tracks_delete', array('id' => $track->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
-        ;
-    }
+ 
        
         private function serialize($data)
     {
