@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
+use  AppBundle\Entity\Track;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use JMS\Serializer\SerializationContext;
@@ -28,8 +29,10 @@ class UserController extends Controller
              $this->getUser();
         $em = $this->getDoctrine()->getManager();
      $users = $em->getRepository('AppBundle:User')
+               
                 ->createQueryBuilder('u')
-                ->select('u.id,u.username,u.email,u.enabled,u.lastLogin')
+                ->leftJoin('u.track', 'h')
+                ->select('u.id,u.username,u.email,u.enabled,u.lastLogin,h.id AS trackid')
                 ->getQuery()
                 ->getResult();
 

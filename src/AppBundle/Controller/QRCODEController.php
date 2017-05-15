@@ -11,8 +11,70 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\SvgWriter;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
+use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use AppBundle\Entity\Track;
+/**
+ * QR controller.
+ *
+ * @Route("qr")
+ */
+
 class QRCODEController extends Controller
 {
+
+
+
+       /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/", name="qr_show")
+     * @Method("GET")
+     */
+    public function generateAction()
+    {
+         $em = $this->getDoctrine()->getManager();
+
+        $tracks = $em->getRepository('AppBundle:Track')->findAll();
+ $cache = new FilesystemAdapter();
+        foreach ($tracks as $track)
+{
+
+  $qrid= $cache->getItem('qrid.'.$track->getId());
+$qrcode= $cache->getItem('qrcode.'.$track->getCode());
+
+ $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track->getCode()]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+
+
+}
+        $cache = new FilesystemAdapter();
+        $numProducts = $cache->getItem('stats.num_products');
+       
+$numProducts->set(["youll be fine"=>"kikis","BIG"=>'soft','time'=>time()]);
+$cache->save($numProducts);
+
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$numProducts]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+    }
+        /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/", name="qr_show2")
+     * @Method("POST")
+     */
+    public function show2Action()
+    {
+        $cache = new FilesystemAdapter();
+        $numProducts = $cache->getItem('stats.num_products');
+       if($numProducts->isHit())
+        $total = $numProducts->get();
+
+
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$total]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+    }
     /**
      * @Route("/getQR")
      */
