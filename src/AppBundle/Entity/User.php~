@@ -29,7 +29,16 @@ class User extends BaseUser
      */
     private $track;
 
-
+/**
+     * 
+     * @ORM\OneToMany(targetEntity="Abscence", mappedBy="user")
+     */
+    private $absencetable;
+    /**
+     * 
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="user")
+     */
+    private $permissions;
     /**
      * Get id
      *
@@ -41,5 +50,35 @@ class User extends BaseUser
     }
 
 
+
+    /**
+     * Set track
+     *
+     * @param \AppBundle\Entity\Track $track
+     *
+     * @return User
+     */
+    public function setTrack(\AppBundle\Entity\Track $track = null)
+    {
+        $this->track = $track;
+
+        return $this;
+    }
+
+    /**
+     * Get track
+     *
+     * @return \AppBundle\Entity\Track
+     */
+    public function getTrack()
+    {
+        return $this->track;
+    }
+
+ public function __construct() {
+     parent::__construct();
+        $this->absencetable = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
+    }
 }
 

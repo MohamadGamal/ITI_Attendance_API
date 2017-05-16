@@ -29,7 +29,16 @@ class User extends BaseUser
      */
     private $track;
 
-
+/**
+     * 
+     * @ORM\OneToMany(targetEntity="Absence", mappedBy="user")
+     */
+    private $absencetable;
+    /**
+     * 
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="user")
+     */
+    private $permissions;
     /**
      * Get id
      *
@@ -64,5 +73,79 @@ class User extends BaseUser
     public function getTrack()
     {
         return $this->track;
+    }
+
+ public function __construct() {
+     parent::__construct();
+        $this->absencetable = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
+    }
+
+    /**
+     * Add absencetable
+     *
+     * @param \AppBundle\Entity\Absence $absencetable
+     *
+     * @return User
+     */
+    public function addAbsencetable(\AppBundle\Entity\Absence $absencetable)
+    {
+        $this->absencetable[] = $absencetable;
+
+        return $this;
+    }
+
+    /**
+     * Remove absencetable
+     *
+     * @param \AppBundle\Entity\Absence $absencetable
+     */
+    public function removeAbsencetable(\AppBundle\Entity\Absence $absencetable)
+    {
+        $this->absencetable->removeElement($absencetable);
+    }
+
+    /**
+     * Get absencetable
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAbsencetable()
+    {
+        return $this->absencetable;
+    }
+
+    /**
+     * Add permission
+     *
+     * @param \AppBundle\Entity\Permission $permission
+     *
+     * @return User
+     */
+    public function addPermission(\AppBundle\Entity\Permission $permission)
+    {
+        $this->permissions[] = $permission;
+
+        return $this;
+    }
+
+    /**
+     * Remove permission
+     *
+     * @param \AppBundle\Entity\Permission $permission
+     */
+    public function removePermission(\AppBundle\Entity\Permission $permission)
+    {
+        $this->permissions->removeElement($permission);
+    }
+
+    /**
+     * Get permissions
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPermissions()
+    {
+        return $this->permissions;
     }
 }

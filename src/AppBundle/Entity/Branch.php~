@@ -133,5 +133,42 @@ class Branch
      public function __construct() {
         $this->tracks = new ArrayCollection();
     }
-}
 
+    /**
+     * Add track
+     *
+     * @param \AppBundle\Entity\Track $track
+     *
+     * @return Branch
+     */
+    public function addTrack(\AppBundle\Entity\Track $track)
+    {
+        $this->tracks[] = $track;
+
+        return $this;
+    }
+
+    /**
+     * Remove track
+     *
+     * @param \AppBundle\Entity\Track $track
+     */
+    public function removeTrack(\AppBundle\Entity\Track $track)
+    {
+        $this->tracks->removeElement($track);
+    }
+
+    /**
+     * Get tracks
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTracks()
+    {
+        return $this->tracks;
+    }
+        public function setTracks( $arrayt)
+    {
+         $this->tracks=new ArrayCollection($arrayt);;
+    }
+}
