@@ -41,7 +41,21 @@ class UserController extends Controller
         return $this->setBaseHeaders($response);
     }
 
+   /**
+     * Lists all users entities.
+     *
+     * @Route("/me", name="user_self")
+     * @Method("GET")
+     */
+    public function getselfAction()
+    {
+             
+      
 
+         $response = new Response($this->serialize(['type'=>"current user",'code'=>1,'user'=>$this->getUser()]), Response::HTTP_CREATED);
+     
+        return $this->setBaseHeaders($response);
+    }
   
 /**
      * Creates a new User entity.
@@ -59,8 +73,10 @@ class UserController extends Controller
     $user->setPlainPassword($request->request->get('password')) ;
      $user->setTrack($em->getRepository('AppBundle:Track')->findOneById($request->request->get('track')));
     $user->setEnabled(true) ;
-   $user->setRoles( array($request->request->get('role')=='admin'?User::ROLE_SUPER_ADMIN:User::ROLE_DEFAULT) ) ;
-  //  var_dump((new \ReflectionClass('AppBundle\Entity\User'))->getConstants());
+   //  var_dump((new \ReflectionClass('AppBundle\Entity\User'))->getConstants());
+     //die;
+   $user->setRoles( array($request->request->get('role')=='admin'?'ROLE_ADMIN':User::ROLE_DEFAULT) ) ;
+   
    
 try{
  $em->persist($user);
