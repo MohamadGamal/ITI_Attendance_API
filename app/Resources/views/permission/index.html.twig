@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Permissions list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Accepted</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for permission in permissions %}
+            <tr>
+                <td><a href="{{ path('permissions_show', { 'id': permission.id }) }}">{{ permission.id }}</a></td>
+                <td>{% if permission.accepted %}Yes{% else %}No{% endif %}</td>
+                <td>{% if permission.date %}{{ permission.date|date('Y-m-d') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('permissions_show', { 'id': permission.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('permissions_edit', { 'id': permission.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('permissions_new') }}">Create a new permission</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Rule</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ rule.id }}</td>
+            </tr>
+            <tr>
+                <th>Days</th>
+                <td>{{ rule.days }}</td>
+            </tr>
+            <tr>
+                <th>Marks</th>
+                <td>{{ rule.marks }}</td>
+            </tr>
+            <tr>
+                <th>Perdaynext</th>
+                <td>{{ rule.perdaynext }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('rules_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('rules_edit', { 'id': rule.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}
