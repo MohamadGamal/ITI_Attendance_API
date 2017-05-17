@@ -104,6 +104,43 @@ catch(Exception $e){
        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
               return $this->setBaseHeaders($response); 
     }
+    /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/{id}/absence", name="user_absence")
+     * @Method("GET")
+     */
+    public function getabsenceAction(User $user)
+    {
+        
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user->getAbsencetable()]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+    }
+        /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/{id}/marks", name="users_show")
+     * @Method("GET")
+     */
+    public function marksAction(User $user)
+    {
+        $em = $this->getDoctrine()->getManager();
+         $rules = $em->getRepository('AppBundle:Rules')->findBy([], ['days' => 'ASC']);
+        $absdays=count ($user->getAbsencetable());
+        $zot=$total=$rules[count($rules)-1]->getMarks();
+        $i=0;
+        if($absdays==0)
+        $total=$total;
+        else if($absdays>= $total)
+        $total=0;
+        else{
+        while($absdays>$rules[$i++]->getDays());
+        $total-=$rules[--$i]->getMarks();
+        $total-=($rules[$i]->getMarks()-$rules[$i-1]->getMarks())/($rules[$i]->getDays()-$rules[$i-1]->getDays()) * ($absdays-$rules[$i]->getDays()) ;
+        }
+       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>["days"=>$absdays,"total"=>$total]]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response); 
+    }
 
         /**
      * Deletes a user entity.
