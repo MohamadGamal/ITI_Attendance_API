@@ -81,7 +81,7 @@ catch(Exception $e){
      * Displays a form to edit an existing rule entity.
      *
      * @Route("/{id}/edit", name="rules_edit")
-     * @Method({"GET", "POST"})
+     * @Method("PUT")
      */
     public function editAction(Request $request, Rules $rule)
     {
