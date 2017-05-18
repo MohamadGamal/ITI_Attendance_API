@@ -80,24 +80,25 @@ class QRCODEController extends Controller
     public function getQRAction(Track $track)
     {
         $cache = new FilesystemAdapter();
-        $refreshinterval=5;
-        $mins=30;
+        $refreshinterval=30;
+        $mins=130;
         $now=new \Datetime();
-        $start=new \Datetime('6:00:00');
+        $start=new \Datetime('19:33:00');
         $end=clone $start;
         $end->add(new \Dateinterval('PT'.$mins.'M'));
-        var_dump($start);
-        var_dump($now);
+        // var_dump($start);
+         // var_dump($now);
         if ($now->getTimestamp()>=$start->getTimestamp() && $now->getTimestamp()<=$end->getTimestamp()) {
             $trackqrcode = $cache->getItem('qrcode.'.$track->getId());
             if (!$trackqrcode->isHit()) {
                 $calc=( $now->getTimestamp()-$start->getTimestamp() ) ;
-               $calc=$calc %$refreshinterval;
-               $dateofbeg=clone $now;
-               $dateofbeg->sub(new \Dateinterval('PT'.$calc.'S'));
-                var_dump( $dateofbeg);
-                die();
-                $currtrackcode=["time"=>$now,"code"=>'abc'.rand()];
+                $calc=$calc %$refreshinterval;
+                $dateofbeg=clone $now;
+                $dateofbeg->sub(new \Dateinterval('PT'.$calc.'S'));
+                
+                $currtrackcode=["time"=>$dateofbeg,"code"=>'abc'.rand(),"refresh_after"=>$refreshinterval-$calc];
+                //  var_dump( $currtrackcode);
+                //   die();
                 $trackqrcode->set($currtrackcode);
                 $cache->save($trackqrcode);
             } else {
@@ -105,18 +106,47 @@ class QRCODEController extends Controller
                 //  $nowmin=$now->getTimestamp()/(1000);
                 //  $starmin=$start->getTimestamp()/(1000);
                 //  $endmin=$end->getTimestamp()/(1000);
-                if ($currtrackcode["time"]->getTimestamp()-$now->getTimestamp() >=$refreshinterval*1000) {
-                    $currtrackcode=["time"=>$now,"code"=>'abc'.rand()];
-                    $trackqrcode->set($currtrackcode);
-                    $cache->save($trackqrcode);
-                } else {
-
+                 $calc=( $now->getTimestamp()-$start->getTimestamp() ) ;
+                $calc=$calc %$refreshinterval;
+                $dateofbeg=clone $now;
+                $dateofbeg->sub(new \Dateinterval('PT'.$calc.'S'));
+               
+                if ($now->getTimestamp()-$currtrackcode["time"]->getTimestamp() >=$refreshinterval) {
+                    $currtrackcode=["time"=>$dateofbeg,"code"=>'abc'.rand(),"refresh_after"=>$refreshinterval-$calc];
                 }
+
+                $currtrackcode=["time"=>$dateofbeg,"code"=>$currtrackcode['code'],"refresh_after"=>$refreshinterval-$calc];
+                $trackqrcode->set($currtrackcode);
+                $cache->save($trackqrcode);
             }
+
+// Create a QR code
+            $qrCode = new QrCode($currtrackcode['code']);
+            $qrCode->setSize(300);
+
+
+            $qrCode
+            ->setMargin(10)
+            ->setEncoding('UTF-8')
+            ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
+            ->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0])
+            ->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255])
+            ->setLabel("Scan the code !")
+ //  ->setLogoPath(__DIR__.'/../Resources/QRrelated/logo.png')
+            ->setLogoSize(150)
+            ->setValidateResult(true)
+            ;
+            $base64image=  base64_encode (
+            $qrCode->writeString(PngWriter::class)
+            );
+            $fullimage='data:image/png;base64,'.$base64image;
+
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>$currtrackcode['code'],'image'=>$fullimage,"expires"=>$currtrackcode['refresh_after']]), Response::HTTP_CREATED);
         } else {
+            
             $response = new Response($this->serialize(['type'=>"error",'code'=>2,'image'=>'wrong time']), Response::HTTP_CREATED);
         }
-        die();
+        return $this->setBaseHeaders($response);
 //if
 //$response = new Response($this->serialize(['type'=>"QRcode",'code'=>1,'image'=>$fullimage]), Response::HTTP_CREATED);
   
