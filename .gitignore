@@ -9,6 +9,7 @@
 /var/logs/*
 !var/logs/.gitkeep
 !/var/sessions
+!/var/jwt
 /var/sessions/*
 !var/sessions/.gitkeep
 !var/SymfonyRequirements.php
