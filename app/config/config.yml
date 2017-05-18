@@ -45,11 +45,11 @@ twig:
 doctrine:
     dbal:
         driver: pdo_mysql
-        host: '%env(database_host)%'
-        port: '%env(database_port)%'
-        dbname: '%env(database_name)%'
-        user: '%env(database_user)%'
-        password: '%env(database_password)%'
+        host: 'eu-cdbr-west-01.cleardb.com'
+        port: '3306'
+        dbname: 'heroku_13b6aef26abe90d'
+        user: 'bfe2f051c82d8d'
+        password: '143f79f8'
         charset: UTF8
         # if using pdo_sqlite as your database driver:
         #   1. add the path in parameters.yml
