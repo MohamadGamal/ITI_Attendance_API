@@ -79,6 +79,7 @@ class QRCODEController extends Controller
      */
     public function getQRAction(Track $track)
     {
+        
 
         $cache = new FilesystemAdapter();
         $refreshinterval=30;
@@ -89,6 +90,7 @@ class QRCODEController extends Controller
         $end->add(new \Dateinterval('PT'.$mins.'M'));
          var_dump($start);
          var_dump($now);
+         die();
         if ($now->getTimestamp()>=$start->getTimestamp() && $now->getTimestamp()<=$end->getTimestamp()) {
             $trackqrcode = $cache->getItem('qrcode.'.$track->getId());
             if (!$trackqrcode->isHit()) {
