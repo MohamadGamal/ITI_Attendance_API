@@ -174,7 +174,7 @@ public function submitqrAction(Request $request,User $user)
             $total-=$rules[--$i]->getMarks();
             $total-=($rules[$i]->getMarks()-$rules[$i-1]->getMarks())/($rules[$i]->getDays()-$rules[$i-1]->getDays()) * ($absdays-$rules[$i]->getDays()) ;
         }
-        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>["days"=>$absdays,"total"=>$total]]), Response::HTTP_CREATED);
+        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>["days"=>$absdays,"total"=>$total,"fullmark"=>$zot]]), Response::HTTP_CREATED);
               return $this->setBaseHeaders($response);
     }
 
