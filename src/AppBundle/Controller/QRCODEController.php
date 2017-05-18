@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use AppBundle\Entity\Track;
+
 /**
  * QR controller.
  *
@@ -37,26 +38,22 @@ class QRCODEController extends Controller
          $em = $this->getDoctrine()->getManager();
 
         $tracks = $em->getRepository('AppBundle:Track')->findAll();
- $cache = new FilesystemAdapter();
-        foreach ($tracks as $track)
-{
+        $cache = new FilesystemAdapter();
+        foreach ($tracks as $track) {
+            $qrid= $cache->getItem('qrid.'.$track->getId());
+            $qrcode= $cache->getItem('qrcode.'.$track->getCode());
 
-  $qrid= $cache->getItem('qrid.'.$track->getId());
-$qrcode= $cache->getItem('qrcode.'.$track->getCode());
-
- $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track->getCode()]), Response::HTTP_CREATED);
-              return $this->setBaseHeaders($response); 
-
-
-}
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track->getCode()]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response);
+        }
         $cache = new FilesystemAdapter();
         $numProducts = $cache->getItem('stats.num_products');
        
-$numProducts->set(["youll be fine"=>"kikis","BIG"=>'soft','time'=>time()]);
-$cache->save($numProducts);
+        $numProducts->set(["youll be fine"=>"kikis","BIG"=>'soft','time'=>time()]);
+        $cache->save($numProducts);
 
-       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$numProducts]), Response::HTTP_CREATED);
-              return $this->setBaseHeaders($response); 
+        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$numProducts]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response);
     }
         /**
      * Finds and displays a user entity.
@@ -68,46 +65,93 @@ $cache->save($numProducts);
     {
         $cache = new FilesystemAdapter();
         $numProducts = $cache->getItem('stats.num_products');
-       if($numProducts->isHit())
-        $total = $numProducts->get();
+        if ($numProducts->isHit()) {
+            $total = $numProducts->get();
+        }
 
 
-       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$total]), Response::HTTP_CREATED);
-              return $this->setBaseHeaders($response); 
+        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$total]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response);
     }
     /**
-     * @Route("/getQR")
+     * @Route("/getQR/{id}")
+     * @Method("GET")
      */
-    public function getQRAction()
+    public function getQRAction(Track $track)
     {
+        $cache = new FilesystemAdapter();
+        $refreshinterval=5;
+        $mins=30;
+        $now=new \Datetime();
+        $start=new \Datetime('6:00:00');
+        $end=clone $start;
+        $end->add(new \Dateinterval('PT'.$mins.'M'));
+        var_dump($start);
+        var_dump($now);
+        if ($now->getTimestamp()>=$start->getTimestamp() && $now->getTimestamp()<=$end->getTimestamp()) {
+            $trackqrcode = $cache->getItem('qrcode.'.$track->getId());
+            if (!$trackqrcode->isHit()) {
+                $calc=( $now->getTimestamp()-$start->getTimestamp() ) ;
+               $calc=$calc %$refreshinterval;
+               $dateofbeg=clone $now;
+               $dateofbeg->sub(new \Dateinterval('PT'.$calc.'S'));
+                var_dump( $dateofbeg);
+                die();
+                $currtrackcode=["time"=>$now,"code"=>'abc'.rand()];
+                $trackqrcode->set($currtrackcode);
+                $cache->save($trackqrcode);
+            } else {
+                 $currtrackcode = $trackqrcode->get();
+                //  $nowmin=$now->getTimestamp()/(1000);
+                //  $starmin=$start->getTimestamp()/(1000);
+                //  $endmin=$end->getTimestamp()/(1000);
+                if ($currtrackcode["time"]->getTimestamp()-$now->getTimestamp() >=$refreshinterval*1000) {
+                    $currtrackcode=["time"=>$now,"code"=>'abc'.rand()];
+                    $trackqrcode->set($currtrackcode);
+                    $cache->save($trackqrcode);
+                } else {
 
-$limit=30;
+                }
+            }
+        } else {
+            $response = new Response($this->serialize(['type'=>"error",'code'=>2,'image'=>'wrong time']), Response::HTTP_CREATED);
+        }
+        die();
+//if
+//$response = new Response($this->serialize(['type'=>"QRcode",'code'=>1,'image'=>$fullimage]), Response::HTTP_CREATED);
+  
+        $cache = new FilesystemAdapter();
+        $numProducts = $cache->getItem('stats.num_products');
+        if ($numProducts->isHit()) {
+            $total = $numProducts->get();
+        }
+
 // Create a QR code
-$qrCode = new QrCode('Testing strings and other shmulk'.time());
-$qrCode->setSize(300);
+        $qrCode = new QrCode('Testing strings and other shmulk'.time());
+        $qrCode->setSize(300);
 
 // Set advanced options
 // var_dump(__DIR__.'/../Resources/QRrelated/logo.png');
 // die();
-$qrCode
-    ->setMargin(10)
-    ->setEncoding('UTF-8')
-    ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
-->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0])
-    ->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255])
-    ->setLabel("Scan the code in $limit seconds !")
+        $qrCode
+        ->setMargin(10)
+        ->setEncoding('UTF-8')
+        ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
+        ->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0])
+        ->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255])
+        ->setLabel("Scan the code in $limit seconds !")
  //  ->setLogoPath(__DIR__.'/../Resources/QRrelated/logo.png')
-    ->setLogoSize(150)
-    ->setValidateResult(true)
-;
+        ->setLogoSize(150)
+        ->setValidateResult(true)
+        ;
 
-// Output the QR code
-header('Content-Type: '.$qrCode->getContentType(PngWriter::class));
-$base64image=  base64_encode ( 
- $qrCode->writeString(PngWriter::class)
+// // Output the QR code
+// header('Content-Type: '.$qrCode->getContentType(PngWriter::class));
+        $base64image=  base64_encode (
+        $qrCode->writeString(PngWriter::class)
 //    die();//
-    );
-$fullimage='data:image/png;base64,'.$base64image;
+        );
+        $fullimage='data:image/png;base64,'.$base64image;
 
 
          $response = new Response($this->serialize(['type'=>"QRcode",'code'=>1,'image'=>$fullimage]), Response::HTTP_CREATED);
@@ -127,9 +171,6 @@ $fullimage='data:image/png;base64,'.$base64image;
 // // Work via the writer
 // $writer = new PngWriter($qrCode);
 // $pngData = $writer->writeString();
-
-
-
     }
 
 
@@ -137,24 +178,22 @@ $fullimage='data:image/png;base64,'.$base64image;
 
 
     
-        private function serialize($data)
+    private function serialize($data)
     {
         $context = new SerializationContext();
         $context->setSerializeNull(true);
         return $this->get('jms_serializer')->serialize($data, 'json', $context);
     }
 
-       private function setBaseHeaders(Response $response)
+    private function setBaseHeaders(Response $response)
     {
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
-    private function generateRandomQRcode(){
+    private function generateRandomQRcode()
+    {
 
         return rand(1000000)."abcdefgh"[rand(7)].time();
-
-
     }
-
 }
