@@ -58,10 +58,10 @@ class QRCODEController extends Controller
         /**
      * Finds and displays a user entity.
      *
-     * @Route("/", name="qr_show2")
+     * @Route("/{id}", name="qr_show2")
      * @Method("POST")
      */
-    public function show2Action()
+    public function show2Action(Track $track)
     {
         $cache = new FilesystemAdapter();
         $numProducts = $cache->getItem('stats.num_products');
