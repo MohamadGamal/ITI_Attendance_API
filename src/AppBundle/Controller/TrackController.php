@@ -7,9 +7,11 @@ use AppBundle\Entity\Track;
 use AppBundle\Entity\Branch;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
+
 /**
  * Track controller.
  *
@@ -55,20 +57,15 @@ class TrackController extends Controller
         $track->setCode($request->request->get('code'));
         $track->setBranch($em->getRepository('AppBundle:Branch')->findOneById($request->request->get('branch')));
           
-try{
-$em->persist($track);
+        try {
+                $em->persist($track);
             $em->flush();
 
               $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
-
-}
-catch(Exception $e){
-
-  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
-}
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
               return $this->setBaseHeaders($response);
-       
-    
     }
 
     /**
@@ -79,19 +76,38 @@ catch(Exception $e){
      */
     public function showAction(Track $track)
     {
-       $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
-              return $this->setBaseHeaders($response); 
+        $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
+              return $this->setBaseHeaders($response);
     }
 
     /**
      * Displays a form to edit an existing track entity.
      *
-     * @Route("/{id}/edit", name="tracks_edit")
+     * @Route("/{id}", name="tracks_edit")
      * @Method("PUT")
      */
     public function editAction(Request $request, Track $track)
     {
+       $em = $this->getDoctrine()->getManager();
+
+        //      var_dump($request->request->get('array'));
+        // die;
+        //
+
        
+        $track->setName($request->request->get('name'));
+        $track->setCode($request->request->get('code'));
+        $track->setBranch($em->getRepository('AppBundle:Branch')->findOneById($request->request->get('branch')));
+          
+        try {
+                $em->persist($track);
+            $em->flush();
+
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
+              return $this->setBaseHeaders($response);
     }
 
     /**
@@ -105,32 +121,27 @@ catch(Exception $e){
 
 
             $em = $this->getDoctrine()->getManager();
-          try{
+        try {
             $em->remove($track);
             $em->flush();
     
-              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
-
-}
-catch(Exception $e){
-
-  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
-}
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$track]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
               return $this->setBaseHeaders($response);
-      
-       
     }
 
  
        
-        private function serialize($data)
+    private function serialize($data)
     {
         $context = new SerializationContext();
         $context->setSerializeNull(true);
         return $this->get('jms_serializer')->serialize($data, 'json', $context);
     }
 
-       private function setBaseHeaders(Response $response)
+    private function setBaseHeaders(Response $response)
     {
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');

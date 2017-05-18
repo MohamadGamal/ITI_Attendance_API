@@ -91,6 +91,36 @@ public function newAction(Request $request)
     }
       return $this->setBaseHeaders($response);
 }
+/**
+     * Creates a new User entity.
+     *
+     * @Route("/{id}", name="users_new")
+     * @Method("PUT")
+     */
+public function editAction(Request $request,User $user)
+{
+   // $um = $this->container->get('fos_user.user_manager');
+    $em = $this->getDoctrine()->getManager();
+    $user->setEmail($request->request->get('email')) ;
+    $user->setUsername($request->request->get('username')) ;
+    $user->setPlainPassword($request->request->get('password')) ;
+    $user->setTrack($em->getRepository('AppBundle:Track')->findOneById($request->request->get('track')));
+    $user->setEnabled(true) ;
+   //  var_dump((new \ReflectionClass('AppBundle\Entity\User'))->getConstants());
+ //die;
+    $user->setRoles( array($request->request->get('role')=='admin'?'ROLE_ADMIN':User::ROLE_DEFAULT) ) ;
+   
+   
+    try {
+        
+            $em->flush();
+
+              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
+    } catch (Exception $e) {
+          $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+    }
+      return $this->setBaseHeaders($response);
+}
    /**
      * Finds and displays a user entity.
      *

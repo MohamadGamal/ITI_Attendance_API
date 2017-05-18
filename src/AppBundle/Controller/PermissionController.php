@@ -6,7 +6,8 @@ use AppBundle\Entity\Permission;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
 
@@ -26,7 +27,7 @@ class PermissionController extends Controller
     public function indexAction()
     {
        
-       $em = $this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
 
         $permission = $em->getRepository('AppBundle:Permission')->findAll();
 
@@ -55,19 +56,15 @@ class PermissionController extends Controller
 
 
 
-         try{
-$em->persist($permission);
+        try {
+            $em->persist($permission);
             $em->flush();
 
-              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
-
-}
-catch(Exception $e){
-
-  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
-}
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
               return $this->setBaseHeaders($response);
-       
     }
 
     /**
@@ -90,7 +87,43 @@ catch(Exception $e){
      */
     public function editAction(Request $request, Permission $permission)
     {
+
+$em = $this->getDoctrine()->getManager();
+         $permission->setDate(new \DateTime($request->request->get('date'))); 
+        $permission->setAccepted($request->request->get('accepted'));
+         $permission->setUser($em->getRepository('AppBundle:User')->findOneById($request->request->get('user')));
+
+      
+        try {
+            $em->flush();
+
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
+              return $this->setBaseHeaders($response);
+
+    }
+     /**
+     * Displays a form to edit an existing permission entity.
+     *
+     * @Route("/{id}/accept", name="permissions_accept")
+     * @Method("PUT")
+     */
+    public function acceptAction(Request $request, Permission $permission)
+    {
+
+         $em = $this->getDoctrine()->getManager();
        
+          $permission->setAccepted(true);
+        try {
+            $em->flush();
+
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
+              return $this->setBaseHeaders($response);
     }
 
     /**
@@ -102,29 +135,26 @@ catch(Exception $e){
     public function deleteAction(Request $request, Permission $permission)
     {
          $em = $this->getDoctrine()->getManager();
-          try{
+        try {
             $em->remove($permission);
             $em->flush();
     
-              $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
-
-}
-catch(Exception $e){
-
-  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
-}
+            $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$permission]), Response::HTTP_CREATED);
+        } catch (Exception $e) {
+                  $response = new Response($this->serialize(['type'=>"failed",'code'=>2,"message"=>$e->getMessage()]), Response::HTTP_CREATED);
+        }
               return $this->setBaseHeaders($response);
     }
 
           
-        private function serialize($data)
+    private function serialize($data)
     {
         $context = new SerializationContext();
         $context->setSerializeNull(true);
         return $this->get('jms_serializer')->serialize($data, 'json', $context);
     }
 
-       private function setBaseHeaders(Response $response)
+    private function setBaseHeaders(Response $response)
     {
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');

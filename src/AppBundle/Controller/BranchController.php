@@ -84,13 +84,13 @@ catch(Exception $e){
      */
     public function editAction(Request $request, Branch $branch)
     {
-       
+        $em = $this->getDoctrine()->getManager();
        $branch->setName($request->request->get('name'));
         $branch->setCode($request->request->get('code'));
         $branch->setAddress($request->request->get('address')); 
- var_dump($branch);
+
         
-        die();
+       
         try{
 $em->persist($branch);
             $em->flush();
