@@ -59,7 +59,18 @@ public function getselfAction()
      
     return $this->setBaseHeaders($response);
 }
-  
+  /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/{id}", name="users_show")
+     * @Method("GET")
+     */
+public function showAction(User $user)
+{
+    $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
+      return $this->setBaseHeaders($response);
+}
+
 /**
      * Creates a new User entity.
      *
@@ -121,17 +132,7 @@ public function editAction(Request $request,User $user)
     }
       return $this->setBaseHeaders($response);
 }
-   /**
-     * Finds and displays a user entity.
-     *
-     * @Route("/{id}", name="users_show")
-     * @Method("GET")
-     */
-public function showAction(User $user)
-{
-    $response = new Response($this->serialize(['type'=>"sucess",'code'=>1,'data'=>$user]), Response::HTTP_CREATED);
-      return $this->setBaseHeaders($response);
-}
+   
     /**
      * Finds and displays a user entity.
      *
