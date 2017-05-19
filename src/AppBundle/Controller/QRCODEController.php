@@ -26,6 +26,20 @@ class QRCODEController extends Controller
 {
 
 
+       /**
+     * Finds and displays a user entity.
+     *
+     * @Route("/time", name="qr_show")
+     * @Method("GET")
+     */
+    public function generateAction()
+    {
+          $now=new \Datetime();
+          var_dump($now);
+          die();
+        // $em = $this->getDoctrine()->getManager();
+
+    }
 
        /**
      * Finds and displays a user entity.
