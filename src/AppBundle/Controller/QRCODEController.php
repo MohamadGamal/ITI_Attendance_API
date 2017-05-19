@@ -32,7 +32,7 @@ class QRCODEController extends Controller
      * @Route("/time", name="qr_show")
      * @Method("GET")
      */
-    public function generateAction()
+    public function lauraAction()
     {
           $now=new \Datetime();
           var_dump($now);
