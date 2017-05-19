@@ -62,7 +62,7 @@ public function getselfAction()
   /**
      * Finds and displays a user entity.
      *
-     * @Route("/{id}", name="users_show")
+     * @Route("/{id}", name="s_user_show")
      * @Method("GET")
      */
 public function showAction(User $user)
