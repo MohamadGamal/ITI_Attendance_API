@@ -29,7 +29,7 @@ class QRCODEController extends Controller
        /**
      * Finds and displays a user entity.
      *
-     * @Route("/time", name="qr_show")
+     * @Route("/time", name="qr_show_time")
      * @Method("GET")
      */
     public function lauraAction()
