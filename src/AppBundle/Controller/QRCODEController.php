@@ -97,9 +97,9 @@ class QRCODEController extends Controller
 
         $cache = new FilesystemAdapter();
         $refreshinterval=30;
-        $mins=130;
+        $mins=30;
         $now=new \Datetime();
-        $start=new \Datetime('19:33:00');
+        $start=new \Datetime('7:00:00');
         $end=clone $start;
         $end->add(new \Dateinterval('PT'.$mins.'M'));
        
