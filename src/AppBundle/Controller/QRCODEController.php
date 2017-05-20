@@ -102,7 +102,9 @@ class QRCODEController extends Controller
         $start=new \Datetime('7:00:00');
         $end=clone $start;
         $end->add(new \Dateinterval('PT'.$mins.'M'));
-       
+       var_dump($now);
+       var_dump($start);
+       var_dump($end);
         if ($now->getTimestamp()>=$start->getTimestamp() && $now->getTimestamp()<=$end->getTimestamp()) {
             $trackqrcode = $cache->getItem('qrcode.'.$track->getId());
             if (!$trackqrcode->isHit()) {
